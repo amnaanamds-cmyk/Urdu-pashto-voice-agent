@@ -1,0 +1,7 @@
+clip,language,dialect,noise,reference,key_terms
+ps_001.wav,ps,peshawari,quiet,da ghakh dard de appointment ghwaram,appointment
+ps_002.wav,ps,peshawari,street,sabaa maspakhin 4 bajay,sabaa|4/char
+ps_003.wav,ps,peshawari,quiet,zama num imran de,imran
+ur_001.wav,ur,,quiet,room khali hai fees kitni hai,room|fees
+ur_002.wav,ur,,shop,kal subah 11 baje appointment chahiye,kal|11/gyarah
+mx_001.wav,mixed,peshawari,quiet,ji sabaa 4 bajay booking kar dein,sabaa|4/char|booking

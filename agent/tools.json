@@ -1,0 +1,97 @@
+[
+  {
+    "name": "check_slots",
+    "description": "Return free appointment times for a date and service. Call before offering any time to the caller.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "date": { "type": "string", "format": "date", "description": "YYYY-MM-DD in Asia/Karachi time" },
+        "service": { "type": "string", "description": "Service name as listed in business info" }
+      },
+      "required": ["date", "service"]
+    }
+  },
+  {
+    "name": "book",
+    "description": "Create a booking and send the caller a WhatsApp confirmation. Only call after confirming name, day, and time with the caller.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string", "description": "Caller phone in E.164, e.g. +923001234567" },
+        "date": { "type": "string", "format": "date" },
+        "time": { "type": "string", "description": "HH:MM, 24-hour" },
+        "service": { "type": "string" }
+      },
+      "required": ["name", "phone", "date", "time", "service"]
+    }
+  },
+  {
+    "name": "find_booking",
+    "description": "Find the caller's existing upcoming booking(s) by phone number.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "phone": { "type": "string" }
+      },
+      "required": ["phone"]
+    }
+  },
+  {
+    "name": "reschedule",
+    "description": "Move an existing booking to a new time. Confirm the new day and time with the caller first.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "booking_id": { "type": "string" },
+        "new_time": { "type": "string", "format": "date-time", "description": "ISO 8601 with +05:00 offset" }
+      },
+      "required": ["booking_id", "new_time"]
+    }
+  },
+  {
+    "name": "cancel",
+    "description": "Cancel an existing booking. Confirm with the caller first.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "booking_id": { "type": "string" }
+      },
+      "required": ["booking_id"]
+    }
+  },
+  {
+    "name": "get_rooms",
+    "description": "Hostels only. Live room availability and fees from HOSTIX.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "description": "Room type, e.g. '1 seater', '2 seater'. Omit for all." }
+      }
+    }
+  },
+  {
+    "name": "transfer",
+    "description": "Forward the call to the staff number. Use when the caller asks for a human, is angry, or you cannot help. Returns busy if staff does not answer.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "reason": { "type": "string", "enum": ["asked_for_human", "angry", "not_understood", "out_of_scope", "other"] }
+      },
+      "required": ["reason"]
+    }
+  },
+  {
+    "name": "take_message",
+    "description": "Save a message for staff and WhatsApp it to the owner. Do not include symptoms or health details.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "message": { "type": "string" }
+      },
+      "required": ["name", "phone", "message"]
+    }
+  }
+]
