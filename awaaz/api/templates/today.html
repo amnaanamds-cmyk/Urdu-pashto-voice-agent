@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Today · {{ day.strftime("%a %d %b") }}</h1>
+<div class="tiles">
+  <div class="tile"><b>{{ stats.calls }}</b><span>calls</span></div>
+  <div class="tile"><b>{{ stats.bookings }}</b><span>bookings made</span></div>
+  <div class="tile"><b>{{ stats.saved }}</b><span>after-hours calls saved</span></div>
+  <div class="tile"><b>{{ stats.transferred }}</b><span>transferred to staff</span></div>
+  <div class="tile"><b>{{ stats.open_messages }}</b><span>messages waiting</span></div>
+</div>
+
+<h2>Today's appointments</h2>
+<div class="card scroll">
+{% if bookings %}
+<table><tr><th>Time</th><th>Name</th><th>Phone</th><th>Service</th></tr>
+{% for b in bookings %}
+<tr><td>{{ b.start_time.strftime("%H:%M") }}</td><td>{{ b.caller_name }}</td><td>{{ b.caller_phone }}</td><td>{{ b.service or "—" }}</td></tr>
+{% endfor %}</table>
+{% else %}<p class="muted">No appointments today.</p>{% endif %}
+</div>
+
+<h2>Latest calls</h2>
+<div class="card scroll">
+{% if calls %}
+<table><tr><th>When</th><th>Caller</th><th>Language</th><th>Outcome</th></tr>
+{% for c in calls %}
+<tr><td><a href="/calls/{{ c.id }}">{{ c.started_at|pkt("%d %b %H:%M") }}</a></td><td>{{ c.caller_phone or "hidden" }}</td>
+<td>{{ lang_label[c.language] }}</td><td><span class="pill">{{ outcome_label[c.outcome] }}</span>{% if c.after_hours %} <span class="pill off">after hours</span>{% endif %}</td></tr>
+{% endfor %}</table>
+{% else %}<p class="muted">No calls yet.</p>{% endif %}
+</div>
+{% endblock %}

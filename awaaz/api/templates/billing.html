@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Billing</h1>
+<div class="tiles">
+  <div class="tile"><b>{{ "%.1f"|format(used) }}</b><span>minutes this month ({{ month.strftime("%b %Y") }})</span></div>
+  <div class="tile"><b>{{ "%.1f"|format(used_prev) }}</b><span>minutes in {{ prev.strftime("%b %Y") }}</span></div>
+  <div class="tile"><b>{{ biz.plan }}</b><span>plan</span></div>
+</div>
+<div class="card" style="margin-top:16px">
+  <p>Pay by JazzCash or Easypaisa. Send the amount with your business name as the reference, then WhatsApp the receipt to Awaaz Desk.</p>
+  <p class="muted">Online JazzCash/Easypaisa checkout is not wired up yet.</p>
+</div>
+{% endblock %}

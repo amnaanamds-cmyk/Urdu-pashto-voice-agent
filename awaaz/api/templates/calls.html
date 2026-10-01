@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Calls</h1>
+<div class="card scroll">
+{% if calls %}
+<table><tr><th>When</th><th>Caller</th><th>Language</th><th>Duration</th><th>Outcome</th></tr>
+{% for c in calls %}
+<tr><td><a href="/calls/{{ c.id }}">{{ c.started_at|pkt("%d %b %H:%M") }}</a></td>
+<td>{{ c.caller_phone or "hidden" }}</td><td>{{ lang_label[c.language] }}</td>
+<td>{% if c.duration_sec %}{{ c.duration_sec // 60 }}:{{ "%02d"|format(c.duration_sec % 60) }}{% else %}—{% endif %}</td>
+<td><span class="pill">{{ outcome_label[c.outcome] }}</span>{% if c.after_hours %} <span class="pill off">after hours</span>{% endif %}</td></tr>
+{% endfor %}</table>
+{% else %}<p class="muted">No calls yet.</p>{% endif %}
+</div>
+{% endblock %}

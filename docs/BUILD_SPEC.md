@@ -31,7 +31,7 @@ fix one of them in the same PR.
 
 ## 2. Agent system prompt (core)
 
-Canonical version lives in [`agent/prompts/system_prompt.md`](../agent/prompts/system_prompt.md).
+Canonical version lives in [`awaaz/agent/prompts/system_prompt.md`](../awaaz/agent/prompts/system_prompt.md); `awaaz/agent/prompt.py` adds the channel rules (voice replies in Urdu/Pashto script for TTS), business info, today's date, and the caller's number.
 
 ```
 You are the receptionist for {business_name}, a {business_type} in {city}.
@@ -53,7 +53,7 @@ Business info:
 
 ## 3. Tools the agent calls
 
-JSON schemas live in [`agent/tools.json`](../agent/tools.json).
+JSON schemas live in [`awaaz/agent/tools.json`](../awaaz/agent/tools.json), handlers in `awaaz/agent/tools.py`.
 
 | Tool | Input | Does |
 |---|---|---|
@@ -65,10 +65,13 @@ JSON schemas live in [`agent/tools.json`](../agent/tools.json).
 | `get_rooms` | (hostel) type | Live availability from HOSTIX |
 | `transfer` | reason | Forwards to staff number |
 | `take_message` | name, phone, message | Saves + WhatsApps owner |
+| `end_call` | goodbye | Says goodbye and hangs up (wrong number, done, emergency) |
+
+Phone defaults to caller ID. `book`/`reschedule` take date + HH:MM; `find_booking`, `reschedule`, `cancel` only touch bookings made from the caller's own number. `transfer` only works during opening hours and otherwise returns `staff_unavailable` so the agent takes a message.
 
 ## 4. Database (Supabase)
 
-Schema + RLS in [`api/supabase/migrations/0001_init.sql`](../api/supabase/migrations/0001_init.sql).
+Schema + RLS in [`supabase/migrations/0001_init.sql`](../supabase/migrations/0001_init.sql); mirrored for SQLite dev in `awaaz/db.py`. Beyond the list below: `businesses` has `ai_phone` (number callers dial), `owner_whatsapp`, `voice`, `recording_retention_days`, `owner_token_hash`; `calls` has `provider_call_id`, `ended_reason`, `cost_usd`, `after_hours`; status columns are text + CHECK.
 
 - `businesses`: id, name, type, city, languages, staff_phone, timings, faq_json, plan
 - `services`: id, business_id, name, duration_min, price
@@ -85,14 +88,20 @@ pattern as HOSTYLLO.
 ## 5. Repo structure
 
 ```
-agent/          # LiveKit/Vapi agent, prompts, tool handlers
-api/            # booking + webhook endpoints, Supabase migrations
-dashboard/      # Next.js owner app
-integrations/   # hostix, whatsapp, telephony
-tests/audio/    # real Pashto/Urdu call recordings for accuracy tests
-scripts/        # onboarding, seed data, accuracy test
-docs/           # this spec
+awaaz/agent/         # Claude engine, prompts, tool handlers
+awaaz/telephony/     # Vapi: assistant config, SSE, call control
+awaaz/api/           # FastAPI: Vapi endpoints + owner dashboard (server-rendered)
+awaaz/integrations/  # whatsapp, hostix, secrets
+supabase/migrations/ # Postgres schema + RLS
+tests/audio/         # real Pashto/Urdu call recordings for accuracy tests (git-ignored)
+scripts/             # accuracy test, seed business configs
+docs/                # this spec, GO_LIVE.md
 ```
+
+Telephony is Vapi with our server as its custom LLM (fastest path to a real
+number; swap to LiveKit later behind `CallControl` if costs demand it). The
+dashboard is server-rendered from the same app instead of a separate Next.js
+app, to keep one deployable for the pilot.
 
 ## 6. Latency budget (the make-or-break)
 
@@ -108,7 +117,7 @@ caller stops talking to when the AI starts speaking.
 
 **Tricks:**
 - Stream everything.
-- Use a fast Claude model for conversation.
+- Use a fast Claude model for conversation (default `claude-haiku-4-5`, `AWAAZ_MODEL` to change).
 - Say "ji, ek second" while a tool runs.
 - Keep replies short.
 
@@ -124,6 +133,13 @@ caller stops talking to when the AI starts speaking.
 | Wrong number / spam | Short polite end |
 | No slots left | Offer next available day or waitlist |
 | Staff line busy on transfer | Take a message, WhatsApp the owner |
+
+In code: silence → Vapi `customer.speech.timeout` hook (5 s); transfer outside
+opening hours or a failed transfer → `staff_unavailable` → `take_message`;
+taken/double-booked slot → nearest free times; nothing free → next available
+day; Claude unreachable → a fixed apology line and offer to take a message;
+everything else is prompt rules (`system_prompt.md`) with tests in
+`tests/unit/test_agent.py`.
 
 ## 8. Business onboarding (target: 10 minutes)
 
@@ -173,8 +189,9 @@ Don't guess these. Log real numbers from the pilot and set prices after.
   and slot. No symptoms in the booking record.
 - Announce recording at the start of every call.
 - Auto-delete recordings after a set period (e.g., 30–90 days), configurable
-  per business (`businesses.recording_retention_days`).
-- Encrypt recordings, and only the owner can access them.
+  per business (`businesses.recording_retention_days`). `python -m awaaz jobs daily`
+  deletes the call at Vapi and clears our recording URL + transcript.
+- Encrypt recordings, and only the owner can access them. The dashboard proxies audio so the storage URL never reaches the browser; RLS makes `calls` owner-only.
 - Keep API keys in env/secret storage, never in code or chat.
 
 ## 12. Testing plan

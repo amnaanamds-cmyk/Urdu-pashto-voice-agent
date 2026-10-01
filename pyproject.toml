@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "awaaz-desk"
+version = "0.1.0"
+description = "AI phone receptionist for clinics, hostels, and shops (Pashto / Urdu / English)"
+requires-python = ">=3.11"
+dependencies = [
+  "anthropic>=1.11",
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "sqlalchemy>=2.0.30",
+  "psycopg[binary]>=3.2",
+  "httpx>=0.27",
+  "jinja2>=3.1",
+  "python-multipart>=0.0.9",
+  "itsdangerous>=2.2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+include = ["awaaz*"]
+
+[tool.setuptools.package-data]
+awaaz = ["agent/prompts/*.md", "agent/tools.json", "api/templates/*.html"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/unit"]

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Messages</h1>
+<div class="card scroll">
+{% if messages %}
+<table><tr><th>When</th><th>From</th><th>Message</th><th></th></tr>
+{% for m in messages %}
+<tr class="{{ 'muted' if m.handled }}"><td>{{ m.created_at|pkt("%d %b %H:%M") }}</td>
+<td>{{ m.caller_name or "—" }}<br><span class="muted">{{ m.caller_phone or "" }}</span></td>
+<td>{{ m.text }}</td>
+<td>{% if not m.handled %}<form class="inline" method="post" action="/messages/{{ m.id }}/handled"><button>Done</button></form>{% else %}✓{% endif %}</td></tr>
+{% endfor %}</table>
+{% else %}<p class="muted">No messages.</p>{% endif %}
+</div>
+{% endblock %}

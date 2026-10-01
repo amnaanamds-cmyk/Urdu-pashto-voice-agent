@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Call · {{ call.started_at|pkt("%d %b %Y %H:%M") }}</h1>
+<div class="card">
+  <p>Caller: <b>{{ call.caller_phone or "hidden" }}</b> · Language: {{ lang_label[call.language] }} ·
+  Outcome: <span class="pill">{{ outcome_label[call.outcome] }}</span>
+  {% if call.after_hours %}<span class="pill off">after hours</span>{% endif %}</p>
+  {% if call.recording_url %}
+  <audio controls preload="none" src="/calls/{{ call.id }}/recording" style="width:100%"></audio>
+  {% else %}<p class="muted">Recording not available (not recorded, or deleted after {{ biz.recording_retention_days }} days).</p>{% endif %}
+</div>
+<h2>Transcript</h2>
+<div class="card"><pre>{{ call.transcript or "—" }}</pre></div>
+{% endblock %}

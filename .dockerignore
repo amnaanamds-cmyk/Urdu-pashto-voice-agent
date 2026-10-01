@@ -1,0 +1,6 @@
+.git
+.env
+*.db
+tests/audio/clips
+results
+__pycache__

@@ -1,0 +1,108 @@
+[
+  {
+    "name": "check_slots",
+    "description": "Return free appointment times for a date. Call this before offering any time to the caller. If the date has nothing free, the result includes the next day that does.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "date": { "type": "string", "description": "YYYY-MM-DD (Pakistan time). Resolve 'aaj', 'kal', 'sabaa', weekday names using today's date from the context." },
+        "service": { "type": "string", "description": "Service name as listed in business info, if the caller named one" }
+      },
+      "required": ["date"]
+    }
+  },
+  {
+    "name": "book",
+    "description": "Create a booking and send the caller a WhatsApp confirmation. Only call after you have read back the name, day, and time and the caller agreed.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Caller's name" },
+        "phone": { "type": "string", "description": "Only if the caller gave a different number; defaults to the number they are calling from" },
+        "date": { "type": "string", "description": "YYYY-MM-DD" },
+        "time": { "type": "string", "description": "HH:MM, 24-hour, exactly as returned by check_slots" },
+        "service": { "type": "string" }
+      },
+      "required": ["name", "date", "time"]
+    }
+  },
+  {
+    "name": "find_booking",
+    "description": "Find the caller's upcoming bookings. Needed before reschedule or cancel.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "phone": { "type": "string", "description": "Only needed if caller ID is hidden; otherwise the caller's own number is used" }
+      }
+    }
+  },
+  {
+    "name": "reschedule",
+    "description": "Move an existing booking to a new free time. Check the new time with check_slots and confirm with the caller first.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "booking_id": { "type": "string", "description": "id from find_booking" },
+        "date": { "type": "string", "description": "New date, YYYY-MM-DD" },
+        "time": { "type": "string", "description": "New time, HH:MM 24-hour" }
+      },
+      "required": ["booking_id", "date", "time"]
+    }
+  },
+  {
+    "name": "cancel",
+    "description": "Cancel an existing booking. Confirm with the caller first.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "booking_id": { "type": "string", "description": "id from find_booking" }
+      },
+      "required": ["booking_id"]
+    }
+  },
+  {
+    "name": "get_rooms",
+    "description": "Hostels only. Live room availability and monthly fees from HOSTIX.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "description": "Room type, e.g. '1 seater', '2 seater'. Omit for all." }
+      }
+    }
+  },
+  {
+    "name": "transfer",
+    "description": "Forward the call to staff. Use when the caller asks for a human, is angry, or you cannot help. If it returns staff_unavailable, offer to take a message instead.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "reason": { "type": "string", "enum": ["asked_for_human", "angry", "not_understood", "out_of_scope", "other"] }
+      },
+      "required": ["reason"]
+    }
+  },
+  {
+    "name": "take_message",
+    "description": "Save a message for staff and WhatsApp it to the owner. Never include symptoms or health details.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string", "description": "Only if different from the number they are calling from" },
+        "message": { "type": "string", "description": "Short summary of what the caller wants, no health details" }
+      },
+      "required": ["message"]
+    }
+  },
+  {
+    "name": "end_call",
+    "description": "Say a short goodbye and hang up. Use after the caller is done, for wrong numbers/spam, or after a medical-emergency instruction. Put the goodbye in 'goodbye' and do not also write it as a reply.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "goodbye": { "type": "string", "description": "One short goodbye sentence in the caller's language" }
+      },
+      "required": ["goodbye"]
+    }
+  }
+]

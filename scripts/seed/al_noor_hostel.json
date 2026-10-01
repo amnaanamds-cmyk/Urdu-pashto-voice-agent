@@ -1,0 +1,23 @@
+{
+  "name": "Al-Noor Boys Hostel",
+  "type": "hostel",
+  "city": "Peshawar",
+  "languages": ["ur", "ps"],
+  "ai_phone": "+92915550202",
+  "staff_phone": "+923001110002",
+  "owner_whatsapp": "+923001110002",
+  "timings": {
+    "slot_minutes": 60,
+    "days": {
+      "mon": [["10:00", "18:00"]], "tue": [["10:00", "18:00"]], "wed": [["10:00", "18:00"]],
+      "thu": [["10:00", "18:00"]], "fri": [["15:00", "18:00"]], "sat": [["10:00", "18:00"]]
+    }
+  },
+  "services": [{"name": "Hostel visit", "duration_min": 60}],
+  "hostix": {"base_url": "https://hostix.example.com", "api_key_ref": "env:HOSTIX_KEY_ALNOOR"},
+  "faq": {
+    "address": "Street 4, University Town, Peshawar",
+    "rules": "Gate closes 11 pm. Security deposit one month's fee.",
+    "visit": "Visits by appointment; book a 'Hostel visit' slot"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "name": "Dr. Khan Dental Clinic",
+  "type": "clinic",
+  "city": "Peshawar",
+  "languages": ["ur", "ps", "en"],
+  "ai_phone": "+92915550101",
+  "staff_phone": "+923001110001",
+  "owner_whatsapp": "+923001110001",
+  "recording_retention_days": 30,
+  "timings": {
+    "slot_minutes": 30,
+    "days": {
+      "mon": [["10:00", "14:00"], ["16:00", "20:00"]],
+      "tue": [["10:00", "14:00"], ["16:00", "20:00"]],
+      "wed": [["10:00", "14:00"], ["16:00", "20:00"]],
+      "thu": [["10:00", "14:00"], ["16:00", "20:00"]],
+      "sat": [["10:00", "14:00"], ["16:00", "20:00"]],
+      "sun": [["16:00", "20:00"]]
+    }
+  },
+  "services": [
+    {"name": "Checkup", "duration_min": 30, "price": 1500},
+    {"name": "Scaling / cleaning", "duration_min": 30, "price": 4000},
+    {"name": "Root canal (first visit)", "duration_min": 30, "price": 12000}
+  ],
+  "faq": {
+    "address": "Main University Road, near Board Bazaar, Peshawar",
+    "doctor": "Dr. Imran Khan, BDS",
+    "friday": "Clinic closed on Friday",
+    "parking": "Parking available in front of the clinic",
+    "payment": "Cash, JazzCash, Easypaisa"
+  }
+}

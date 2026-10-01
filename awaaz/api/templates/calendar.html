@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Calendar</h1>
+<p><a class="btn" href="/calendar?start={{ prev }}">← Previous week</a> <a class="btn" href="/calendar?start={{ next }}">Next week →</a></p>
+{% for d in days %}
+<div class="card scroll">
+  <h2 style="margin-top:0">{{ d.strftime("%A %d %b") }} <span class="muted" style="font-weight:400">· {{ free[d]|length }} free</span></h2>
+  {% set rows = by_day[d] %}
+  {% if rows %}
+  <table><tr><th>Time</th><th>Name</th><th>Phone</th><th>Status</th><th>Move to</th><th></th></tr>
+  {% for b in rows %}
+  <tr>
+    <td>{{ b.start_time.strftime("%H:%M") }}</td><td>{{ b.caller_name }}</td><td>{{ b.caller_phone }}</td>
+    <td><span class="pill {{ '' if b.status == 'confirmed' else 'off' }}">{{ b.status }}</span></td>
+    <td>{% if b.status == 'confirmed' %}
+      <form class="inline" method="post" action="/bookings/{{ b.id }}/move">
+        <input type="date" name="new_date" value="{{ d.isoformat() }}" required>
+        <input type="time" name="new_time" step="900" required>
+        <button>Move</button>
+      </form>{% endif %}</td>
+    <td>{% if b.status == 'confirmed' %}<form class="inline" method="post" action="/bookings/{{ b.id }}/cancel" onsubmit="return confirm('Cancel this booking?')"><button>Cancel</button></form>{% endif %}</td>
+  </tr>
+  {% endfor %}</table>
+  {% else %}<p class="muted">No bookings.</p>{% endif %}
+  {% if free[d] %}
+  <form method="post" action="/bookings" style="margin-top:10px">
+    <input type="hidden" name="day" value="{{ d.isoformat() }}">
+    <select name="at">{% for t in free[d] %}<option value="{{ t.strftime('%H:%M') }}">{{ t.strftime('%H:%M') }}</option>{% endfor %}</select>
+    <input name="name" placeholder="Name" required> <input name="phone" placeholder="03xx-xxxxxxx" required>
+    <button>Add booking</button>
+  </form>
+  {% endif %}
+</div>
+{% endfor %}
+{% endblock %}
